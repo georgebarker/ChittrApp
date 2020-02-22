@@ -3,6 +3,7 @@ import { createStackNavigator } from 'react-navigation-stack'
 import LandingScreen from './screens/LandingScreen'
 import LoginScreen from './screens/LoginScreen'
 import SignUpScreen from './screens/SignUpScreen'
+import ChitsScreen from './screens/ChitsScreen'
 
 const AppStackNav = createStackNavigator({
   Landing: {
@@ -16,6 +17,9 @@ const AppStackNav = createStackNavigator({
   },
   SignUp: {
     screen: SignUpScreen
+  },
+  Chits: {
+    screen: ChitsScreen
   }
 })
 
