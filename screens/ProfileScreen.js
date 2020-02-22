@@ -13,31 +13,63 @@ export default class ProfileScreen extends Component {
       givenName: null,
       familyName: null,
       email: null,
-      following: 0,
-      followers: 0,
+      following: [],
+      followers: [],
       chits: null,
-      isLoading: true
+      isProfileLoading: true,
+      isFollowersLoading: true,
+      profileUpdateTriggered: false
     }
     this.getProfile()
+    this.getFollowers()
+  }
+
+  navigateToFollowers () {
+    this.props.navigation.navigate('Followers', { followers: this.state.followers })
+  }
+
+  // This method is used to re-render the component when a different user's profile has been clicked on
+  componentDidUpdate () {
+    if (this.state.userId !== this.props.navigation.state.params.userId && !this.state.profileUpdateTriggered) {
+      this.setState({
+        isProfileLoading: true,
+        isFollowersLoading: true,
+        profileUpdateTriggered: true
+      })
+      this.getProfile()
+      this.getFollowers()
+    }
+  }
+
+  getFollowers () {
+    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.navigation.state.params.userId + '/followers').then((response) => response.json()).then((responseJson) => {
+      this.setState({
+        followers: responseJson,
+        isFollowersLoading: false
+      })
+    }).catch((error) => {
+      console.log(error)
+    })
   }
 
   getProfile () {
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.userId).then((response) => response.json()).then((responseJson) => {
+    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.navigation.state.params.userId).then((response) => response.json()).then((responseJson) => {
       // populates Chits with user metadata
       responseJson.recent_chits.map((chit) => {
         chit.user = {
-          user_id: this.state.userId,
+          user_id: this.props.navigation.state.params.userId,
           given_name: responseJson.given_name,
           family_name: responseJson.family_name
         }
       })
 
       this.setState({
+        userId: responseJson.user_id,
         givenName: responseJson.given_name,
         familyName: responseJson.family_name,
         email: responseJson.email,
         chits: responseJson.recent_chits,
-        isLoading: false
+        isProfileLoading: false
       })
     }).catch((error) => {
       console.log(error)
@@ -45,7 +77,7 @@ export default class ProfileScreen extends Component {
   }
 
   render () {
-    if (this.state.isLoading) {
+    if (this.state.isProfileLoading || this.state.isFollowersLoading) {
       return (
         <LoadingView text='Loading profile...' />
       )
@@ -77,9 +109,9 @@ export default class ProfileScreen extends Component {
             <Text>{this.state.givenName + ' ' + this.state.familyName}</Text>
             <Text>{this.state.email}</Text>
             <View style={{ flexDirection: 'row' }}>
-              <Text>{this.state.following + ' Following'}</Text>
+              <Text>{this.state.following.length + ' Following'}</Text>
               <VerticalDivider />
-              <Text>{this.state.followers + ' Followers'}</Text>
+              <Text onPress={() => this.navigateToFollowers()}>{this.state.followers.length + ' Followers'}</Text>
             </View>
             <View
               style={[GlobalStyles.buttonContainer, { margin: 10 }]}
