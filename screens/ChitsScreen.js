@@ -1,31 +1,54 @@
+/* global fetch */
 import React, { Component } from 'react'
-import { Text, View } from 'react-native'
-import AsyncStorage from '@react-native-community/async-storage'
+import { View, FlatList } from 'react-native'
+import Chit from '../components/Chit'
+import FlatListItemSeparator from '../components/FlatListItemSeparator'
+import LoadingView from '../components/LoadingView'
+import NoChitsFound from '../components/NoChitsFound'
 export default class ChitsScreen extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      token: null
+      token: null,
+      chits: [],
+      isLoading: true
     }
+    this.getChits()
   }
 
-  async getToken () {
-    try {
-      const value = await AsyncStorage.getItem('TOKEN_KEY')
-      if (value !== null) {
-        this.setState({ token: value })
-      }
-    } catch (e) {
-      // error reading value
-    }
+  getChits () {
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=10').then((response) => response.json()).then((responseJson) => {
+      console.log(responseJson)
+      this.setState({
+        chits: responseJson,
+        isLoading: false
+      })
+    }).catch((error) => {
+      console.log(error)
+    })
   }
 
   render () {
-    this.getToken()
+    if (this.state.isLoading) {
+      return (
+        <LoadingView text='Loading chits...' />
+      )
+    }
+
+    if (!this.state.isLoading && this.state.chits.length === 0) {
+      return (
+        <NoChitsFound />
+      )
+    }
+
     return (
       <View>
-        <Text>Chits Screen!</Text>
-        <Text>{this.state.token}</Text>
+        <FlatList
+          data={this.state.chits}
+          renderItem={({ item }) => <Chit chit={item} />}
+          keyExtractor={item => item.chit_id.toString()}
+          ItemSeparatorComponent={FlatListItemSeparator}
+        />
       </View>
     )
   }
