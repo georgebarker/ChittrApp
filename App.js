@@ -6,6 +6,10 @@ import SignUpScreen from './screens/SignUpScreen'
 import ChitsScreen from './screens/ChitsScreen'
 
 const AppStackNav = createStackNavigator({
+
+  Chits: {
+    screen: ChitsScreen
+  },
   Landing: {
     screen: LandingScreen,
     navigationOptions: {
@@ -17,9 +21,6 @@ const AppStackNav = createStackNavigator({
   },
   SignUp: {
     screen: SignUpScreen
-  },
-  Chits: {
-    screen: ChitsScreen
   }
 })
 
