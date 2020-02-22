@@ -4,9 +4,9 @@ import LandingScreen from './screens/LandingScreen'
 import LoginScreen from './screens/LoginScreen'
 import SignUpScreen from './screens/SignUpScreen'
 import ChitsScreen from './screens/ChitsScreen'
+import ProfileScreen from './screens/ProfileScreen'
 
 const AppStackNav = createStackNavigator({
-
   Chits: {
     screen: ChitsScreen
   },
@@ -21,6 +21,9 @@ const AppStackNav = createStackNavigator({
   },
   SignUp: {
     screen: SignUpScreen
+  },
+  Profile: {
+    screen: ProfileScreen
   }
 })
 

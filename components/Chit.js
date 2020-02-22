@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
-import { Text, View, Image } from 'react-native'
+import { Text, View, Image, TouchableOpacity } from 'react-native'
 import TimeAgo from 'react-native-timeago'
 export default class Chit extends Component {
+  navigateToProfile (userId) {
+    this.props.navigation.navigate('Profile', { userId: userId })
+  }
+
   render () {
     return (
       <View
@@ -11,18 +15,19 @@ export default class Chit extends Component {
           padding: 15
         }}
       >
-        <View
+        <TouchableOpacity
           style={{
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center'
           }}
+          onPress={() => this.navigateToProfile(this.props.chit.user.user_id)}
         >
           <Image
             style={{ width: 50, height: 50 }}
             source={{ uri: 'https://facebook.github.io/react-native/img/tiny_logo.png' }}
           />
-        </View>
+        </TouchableOpacity>
         <View
           style={{ flex: 5, padding: 5 }}
         >
@@ -33,7 +38,10 @@ export default class Chit extends Component {
               justifyContent: 'space-between'
             }}
           >
-            <Text style={{ fontWeight: 'bold' }}>{this.props.chit.user.given_name + ' ' + this.props.chit.user.family_name}
+            <Text
+              onPress={() => this.navigateToProfile(this.props.chit.user.user_id)}
+              style={{ fontWeight: 'bold' }}
+            >{this.props.chit.user.given_name + ' ' + this.props.chit.user.family_name}
             </Text>
             <TimeAgo
               style={{ fontStyle: 'italic' }} time={this.props.chit.timestamp}
