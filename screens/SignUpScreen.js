@@ -1,6 +1,7 @@
 /* global fetch */
 import React, { Component } from 'react'
 import { Text, View, Button, StyleSheet, TextInput, Alert } from 'react-native'
+import GlobalStyles from '../GlobalStyles'
 export default class SignUpScreen extends Component {
   constructor (props) {
     super(props)
@@ -28,11 +29,10 @@ export default class SignUpScreen extends Component {
         })
       })
         .then((response) => {
-          if (response.ok) {
-            this.handleSuccess()
-          } else {
-            this.handleFailure()
+          if (!response.ok) {
+            throw Error()
           }
+          this.handleSuccess()
         })
         .catch((error) => {
           console.log(error)
@@ -96,35 +96,35 @@ export default class SignUpScreen extends Component {
           }}
         >Chittr
         </Text>
-        <View style={styles.formContainer}>
+        <View style={GlobalStyles.formContainer}>
           <Text>Given name</Text>
           <Text style={[styles.errorMessage, this.displayError(this.state.givenName)]}>Field is required</Text>
           <TextInput
-            textContentType='givenName' maxLength={50} style={styles.textInput}
+            textContentType='givenName' maxLength={50} style={GlobalStyles.textInput}
             onChangeText={(text) => this.setState({ givenName: text })}
           />
           <Text>Family name</Text>
           <Text style={[styles.errorMessage, this.displayError(this.state.familyName)]}>Field is required</Text>
           <TextInput
-            textContentType='familyName' maxLength={50} style={styles.textInput}
+            textContentType='familyName' maxLength={50} style={GlobalStyles.textInput}
             onChangeText={(text) => this.setState({ familyName: text })}
           />
           <Text>Email address</Text>
           <Text style={[styles.errorMessage, this.displayError(this.state.email)]}>Field is required</Text>
           <Text style={[styles.errorMessage, this.displayEmailError()]}>Enter a valid email address (e.g. george@google.com)</Text>
           <TextInput
-            textContentType='emailAddress' maxLength={320} style={styles.textInput}
+            textContentType='emailAddress' maxLength={320} style={GlobalStyles.textInput}
             onChangeText={(text) => this.setState({ email: text, isEmailValid: true })}
           />
           <Text>Password</Text>
           <Text style={[styles.errorMessage, this.displayError(this.state.password)]}>Field is required</Text>
           <TextInput
-            secureTextEntry textContentType='newPassword' maxLength={512} style={styles.textInput}
+            secureTextEntry textContentType='newPassword' maxLength={512} style={GlobalStyles.textInput}
             onChangeText={(text) => this.setState({ password: text })}
           />
         </View>
         <View
-          style={styles.buttonContainer}
+          style={GlobalStyles.buttonContainer}
         >
           <Button
             title='Sign up'
@@ -137,21 +137,6 @@ export default class SignUpScreen extends Component {
 }
 
 const styles = StyleSheet.create({
-  buttonContainer: {
-    width: 100
-  },
-  formContainer: {
-    padding: 10,
-    margin: 20,
-    alignSelf: 'stretch'
-
-  },
-  textInput: {
-    borderColor: 'black',
-    backgroundColor: 'white',
-    borderWidth: 1,
-    marginBottom: 20
-  },
   errorMessage: {
     color: 'red'
   }
