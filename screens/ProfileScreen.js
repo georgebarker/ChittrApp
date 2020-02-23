@@ -18,27 +18,46 @@ export default class ProfileScreen extends Component {
       chits: null,
       isProfileLoading: true,
       isFollowersLoading: true,
+      isFollowingLoading: true,
       profileUpdateTriggered: false
     }
     this.getProfile()
     this.getFollowers()
+    this.getFollowing()
+  }
+
+  navigateToFollowing () {
+    this.props.navigation.push('Following', { followUsers: this.state.following })
   }
 
   navigateToFollowers () {
-    this.props.navigation.navigate('Followers', { followers: this.state.followers })
+    this.props.navigation.push('Followers', { followUsers: this.state.followers })
   }
 
-  // This method is used to re-render the component when a different user's profile has been clicked on
+  // This method is used to update the component when a different user's profile has been clicked on
   componentDidUpdate () {
     if (this.state.userId !== this.props.navigation.state.params.userId && !this.state.profileUpdateTriggered) {
       this.setState({
         isProfileLoading: true,
         isFollowersLoading: true,
+        isFollowingLoading: true,
         profileUpdateTriggered: true
       })
       this.getProfile()
       this.getFollowers()
+      this.getFollowing()
     }
+  }
+
+  getFollowing () {
+    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.navigation.state.params.userId + '/following').then((response) => response.json()).then((responseJson) => {
+      this.setState({
+        following: responseJson,
+        isFollowingLoading: false
+      })
+    }).catch((error) => {
+      console.log(error)
+    })
   }
 
   getFollowers () {
@@ -77,7 +96,7 @@ export default class ProfileScreen extends Component {
   }
 
   render () {
-    if (this.state.isProfileLoading || this.state.isFollowersLoading) {
+    if (this.state.isProfileLoading || this.state.isFollowersLoading || this.state.isFollowingLoading) {
       return (
         <LoadingView text='Loading profile...' />
       )
@@ -109,7 +128,7 @@ export default class ProfileScreen extends Component {
             <Text>{this.state.givenName + ' ' + this.state.familyName}</Text>
             <Text>{this.state.email}</Text>
             <View style={{ flexDirection: 'row' }}>
-              <Text>{this.state.following.length + ' Following'}</Text>
+              <Text onPress={() => this.navigateToFollowing()}>{this.state.following.length + ' Following'}</Text>
               <VerticalDivider />
               <Text onPress={() => this.navigateToFollowers()}>{this.state.followers.length + ' Followers'}</Text>
             </View>

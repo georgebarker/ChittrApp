@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Text, View, Image, TouchableOpacity, Button } from 'react-native'
-export default class Follower extends Component {
+export default class FollowUser extends Component {
   navigateToProfile (userId) {
     this.props.navigation.navigate('Profile', { userId: userId })
   }

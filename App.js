@@ -5,7 +5,7 @@ import LoginScreen from './screens/LoginScreen'
 import SignUpScreen from './screens/SignUpScreen'
 import ChitsScreen from './screens/ChitsScreen'
 import ProfileScreen from './screens/ProfileScreen'
-import FollowersScreen from './screens/FollowersScreen'
+import FollowScreen from './screens/FollowScreen'
 
 const AppStackNav = createStackNavigator({
   Chits: {
@@ -27,7 +27,10 @@ const AppStackNav = createStackNavigator({
     screen: ProfileScreen
   },
   Followers: {
-    screen: FollowersScreen
+    screen: FollowScreen
+  },
+  Following: {
+    screen: FollowScreen
   }
 })
 
