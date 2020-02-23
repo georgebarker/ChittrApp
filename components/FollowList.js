@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
 import { View, FlatList } from 'react-native'
 import HorizontalDivider from './HorizontalDivider'
-import Follower from '../components/Follower'
-export default class FollowerList extends Component {
+import FollowUser from './FollowUser'
+export default class FollowList extends Component {
   render () {
     return (
       <View>
         <FlatList
-          data={this.props.followers}
-          renderItem={({ item }) => <Follower user={item} navigation={this.props.navigation} />}
+          data={this.props.followUsers}
+          renderItem={({ item }) => <FollowUser user={item} navigation={this.props.navigation} />}
           keyExtractor={item => item.user_id.toString()}
           ItemSeparatorComponent={HorizontalDivider}
         />
