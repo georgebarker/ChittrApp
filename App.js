@@ -8,13 +8,16 @@ import ProfileScreen from './screens/ProfileScreen'
 import FollowScreen from './screens/FollowScreen'
 
 const AppStackNav = createStackNavigator({
-  Chits: {
-    screen: ChitsScreen
-  },
   Landing: {
     screen: LandingScreen,
     navigationOptions: {
       headerShown: false
+    }
+  },
+  Chits: {
+    screen: ChitsScreen,
+    navigationOptions: {
+      headerLeft: () => null
     }
   },
   Login: {

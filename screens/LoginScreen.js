@@ -42,7 +42,7 @@ export default class LoginScreen extends Component {
 
   async saveToken (token) {
     try {
-      await AsyncStorage.setItem('TOKEN_KEY', token)
+      await AsyncStorage.setItem('TOKEN_KEY', JSON.stringify(token))
       return true
     } catch (e) {
       console.log('Failed to set the token')
@@ -51,7 +51,7 @@ export default class LoginScreen extends Component {
   }
 
   handleSuccess (responseJson) {
-    if (this.saveToken(responseJson.token)) {
+    if (this.saveToken(responseJson)) {
       this.props.navigation.navigate('Chits')
     } else {
       this.handleTokenFailure()
