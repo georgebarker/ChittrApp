@@ -3,7 +3,7 @@ import { Text, View, Image, TouchableOpacity } from 'react-native'
 import TimeAgo from 'react-native-timeago'
 export default class Chit extends Component {
   navigateToProfile (userId) {
-    this.props.navigation.push('Profile', { userId: userId })
+    this.props.navigation.navigate('Profile', { userId: userId })
   }
 
   render () {
