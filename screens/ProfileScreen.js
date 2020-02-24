@@ -18,6 +18,7 @@ export default class ProfileScreen extends Component {
       followers: [],
       chits: null,
       token: null,
+      doesCurrentUserFollowThem: null,
       isProfileLoading: true,
       isFollowersLoading: true,
       isFollowingLoading: true,
@@ -25,37 +26,21 @@ export default class ProfileScreen extends Component {
     }
   }
 
-  onFollowButtonPressed () {
-    if (this.state.token.id === this.state.userId) {
-      Alert.alert('Oops!', 'You can\'t follow yourself!')
-      return
-    }
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.userId + '/follow', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Authorization': this.state.token.token
-      }
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw Error()
-        }
-        this.getFollowers()
-        Alert.alert('Success!', 'You are now following ' + this.state.givenName + ' ' + this.state.familyName)
-      })
-      .catch((error) => {
-        console.log(error)
-        Alert.alert('Oops!', 'Something went wrong. Please try again.')
-      })
+  doesCurrentUserFollowThem () {
+    var doesUserFollow = this.state.followers.filter(user => user.user_id === this.state.token.id).length > 0
+    this.setState({ doesCurrentUserFollowThem: doesUserFollow })
   }
 
   navigateToFollowing () {
-    this.props.navigation.push('Following', { followUsers: this.state.following })
+    this.props.navigation.navigate('Following', { followUsers: this.state.following })
   }
 
   navigateToFollowers () {
-    this.props.navigation.push('Followers', { followUsers: this.state.followers })
+    this.props.navigation.navigate('Followers', { followUsers: this.state.followers })
+  }
+
+  isViewLoading () {
+    return this.state.isProfileLoading || this.state.isFollowersLoading || this.state.isFollowingLoading
   }
 
   componentDidMount () {
@@ -66,14 +51,19 @@ export default class ProfileScreen extends Component {
   }
 
   // This method is used to update the component when a different user's profile has been clicked on
-  componentDidUpdate () {
-    if (this.state.userId !== this.props.navigation.state.params.userId && !this.state.profileUpdateTriggered) {
+  componentDidUpdate (prevProps) {
+    if (prevProps.navigation.state.params.userId !== this.props.navigation.state.params.userId && !this.state.profileUpdateTriggered) {
       this.setState({
         profileUpdateTriggered: true
       })
       this.getProfile()
       this.getFollowers()
       this.getFollowing()
+      if (!this.isViewLoading()) {
+        this.setState({
+          profileUpdateTriggered: false
+        })
+      }
     }
   }
 
@@ -86,6 +76,41 @@ export default class ProfileScreen extends Component {
     } catch (error) {
       console.log('Couldn\'t get token')
     }
+  }
+
+  onFollowButtonPressed () {
+    if (this.state.token.id === this.state.userId) {
+      Alert.alert('Oops!', 'You can\'t follow yourself!')
+      return
+    }
+
+    var method
+    var message
+    if (this.state.doesCurrentUserFollowThem) {
+      method = 'DELETE'
+      message = 'You have unfollowed ' + this.state.givenName + ' ' + this.state.familyName
+    } else {
+      method = 'POST'
+      message = 'You are now following ' + this.state.givenName + ' ' + this.state.familyName
+    }
+    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.userId + '/follow', {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Authorization': this.state.token.token
+      }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error()
+        }
+        Alert.alert('Success!', message)
+        this.getFollowers()
+      })
+      .catch((error) => {
+        console.log(error)
+        Alert.alert('Oops!', 'Something went wrong. Please try again.')
+      })
   }
 
   getFollowing () {
@@ -107,6 +132,7 @@ export default class ProfileScreen extends Component {
         followers: responseJson,
         isFollowersLoading: false
       })
+      this.doesCurrentUserFollowThem()
     }).catch((error) => {
       console.log(error)
     })
@@ -138,7 +164,7 @@ export default class ProfileScreen extends Component {
   }
 
   render () {
-    if (this.state.isProfileLoading || this.state.isFollowersLoading || this.state.isFollowingLoading) {
+    if (this.isViewLoading()) {
       return (
         <LoadingView text='Loading profile...' />
       )
@@ -178,7 +204,7 @@ export default class ProfileScreen extends Component {
               style={[GlobalStyles.buttonContainer, { margin: 10 }]}
             >
               <Button
-                title='Follow'
+                title={this.state.doesCurrentUserFollowThem ? 'Unfollow' : 'Follow'}
                 onPress={() => this.onFollowButtonPressed()}
               />
             </View>
