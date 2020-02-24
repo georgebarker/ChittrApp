@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, Image, TouchableOpacity, Button } from 'react-native'
+import { Text, View, Image, TouchableOpacity } from 'react-native'
 export default class FollowUser extends Component {
   navigateToProfile (userId) {
     this.props.navigation.navigate('Profile', { userId: userId })
@@ -34,8 +34,6 @@ export default class FollowUser extends Component {
           style={{ flex: 1, fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}
         >{this.props.user.given_name + ' ' + this.props.user.family_name}
         </Text>
-        <Button style={{ flex: 1 }} title='Follow' />
-
       </View>
     )
   }
