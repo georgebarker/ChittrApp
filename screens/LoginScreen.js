@@ -1,15 +1,24 @@
 /* global fetch */
 import React, { Component } from 'react'
 import { Text, View, TextInput, Button, Alert } from 'react-native'
-import AsyncStorage from '@react-native-community/async-storage'
 import GlobalStyles from '../GlobalStyles'
-
+import AsyncStorage from '@react-native-community/async-storage'
 export default class LoginScreen extends Component {
   constructor (props) {
     super(props)
     this.state = {
       email: null,
       password: null
+    }
+  }
+
+  async saveToken (token) {
+    try {
+      await AsyncStorage.setItem('TOKEN_KEY', JSON.stringify(token))
+      return true
+    } catch (e) {
+      console.log('Failed to set the token')
+      return false
     }
   }
 
@@ -37,16 +46,6 @@ export default class LoginScreen extends Component {
         })
     } else {
       this.handleFailure()
-    }
-  }
-
-  async saveToken (token) {
-    try {
-      await AsyncStorage.setItem('TOKEN_KEY', JSON.stringify(token))
-      return true
-    } catch (e) {
-      console.log('Failed to set the token')
-      return false
     }
   }
 

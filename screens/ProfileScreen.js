@@ -1,11 +1,11 @@
 /* global fetch */
 import React, { Component } from 'react'
 import { View, Text, Image, Button, Alert } from 'react-native'
+import AsyncStorage from '@react-native-community/async-storage'
 import LoadingView from '../components/LoadingView'
 import GlobalStyles from '../GlobalStyles'
 import ChitList from '../components/ChitList'
 import VerticalDivider from '../components/VerticalDivider'
-import AsyncStorage from '@react-native-community/async-storage'
 export default class ProfileScreen extends Component {
   constructor (props) {
     super(props)
@@ -23,6 +23,17 @@ export default class ProfileScreen extends Component {
       isFollowersLoading: true,
       isFollowingLoading: true,
       profileUpdateTriggered: false
+    }
+  }
+
+  async getToken () {
+    try {
+      const token = await AsyncStorage.getItem('TOKEN_KEY')
+      this.setState({
+        token: JSON.parse(token)
+      })
+    } catch (error) {
+      console.log('Couldn\'t get token')
     }
   }
 
@@ -64,17 +75,6 @@ export default class ProfileScreen extends Component {
           profileUpdateTriggered: false
         })
       }
-    }
-  }
-
-  async getToken () {
-    try {
-      const token = await AsyncStorage.getItem('TOKEN_KEY')
-      if (token !== null) {
-        this.setState({ token: JSON.parse(token) })
-      }
-    } catch (error) {
-      console.log('Couldn\'t get token')
     }
   }
 

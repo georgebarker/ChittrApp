@@ -6,7 +6,7 @@ import SignUpScreen from './screens/SignUpScreen'
 import ChitsScreen from './screens/ChitsScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import FollowScreen from './screens/FollowScreen'
-
+import NewChitScreen from './screens/NewChitScreen'
 const AppStackNav = createStackNavigator({
   Landing: {
     screen: LandingScreen,
@@ -34,6 +34,12 @@ const AppStackNav = createStackNavigator({
   },
   Following: {
     screen: FollowScreen
+  },
+  NewChit: {
+    screen: NewChitScreen,
+    navigationOptions: {
+      title: 'Send a chit'
+    }
   }
 })
 
