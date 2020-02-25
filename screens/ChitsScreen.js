@@ -1,8 +1,11 @@
 /* global fetch */
 import React, { Component } from 'react'
+import { View } from 'react-native'
 import LoadingView from '../components/LoadingView'
 import NoChitsFound from '../components/NoChitsFound'
 import ChitList from '../components/ChitList'
+import FloatingActionButton from '../components/FloatingActionButton'
+
 export default class ChitsScreen extends Component {
   constructor (props) {
     super(props)
@@ -11,6 +14,9 @@ export default class ChitsScreen extends Component {
       chits: [],
       isLoading: true
     }
+  }
+
+  componentDidMount () {
     this.getChits()
   }
 
@@ -25,10 +31,20 @@ export default class ChitsScreen extends Component {
     })
   }
 
+  refreshChits () {
+    this.setState({ isLoading: true })
+    this.getChits()
+  }
+
+  onNewChitButtonClicked () {
+    this.props.navigation.navigate('NewChit', { refreshChits: () => this.refreshChits() })
+  }
+
   render () {
     if (this.state.isLoading) {
       return (
         <LoadingView text='Loading chits...' />
+
       )
     }
 
@@ -39,7 +55,10 @@ export default class ChitsScreen extends Component {
     }
 
     return (
-      <ChitList chits={this.state.chits} navigation={this.props.navigation} />
+      <View>
+        <FloatingActionButton onPress={() => this.onNewChitButtonClicked()} />
+        <ChitList chits={this.state.chits} navigation={this.props.navigation} />
+      </View>
     )
   }
 }
