@@ -7,18 +7,13 @@ import ChitsScreen from './screens/ChitsScreen'
 import ProfileScreen from './screens/ProfileScreen'
 import FollowScreen from './screens/FollowScreen'
 import NewChitScreen from './screens/NewChitScreen'
+import UserSearchScreen from './screens/UserSearchScreen'
 const AppStackNav = createStackNavigator({
   Landing: {
-    screen: LandingScreen,
-    navigationOptions: {
-      headerShown: false
-    }
+    screen: LandingScreen
   },
   Chits: {
-    screen: ChitsScreen,
-    navigationOptions: {
-      headerLeft: () => null
-    }
+    screen: ChitsScreen
   },
   Login: {
     screen: LoginScreen
@@ -40,6 +35,9 @@ const AppStackNav = createStackNavigator({
     navigationOptions: {
       title: 'Send a chit'
     }
+  },
+  UserSearch: {
+    screen: UserSearchScreen
   }
 })
 

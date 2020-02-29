@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
-import FollowList from '../components/FollowList'
+import UserList from '../components/UserList'
 export default class FollowScreen extends Component {
   render () {
     return (
-      <FollowList followUsers={this.props.navigation.state.params.followUsers} navigation={this.props.navigation} />
+      <UserList users={this.props.navigation.state.params.users} navigation={this.props.navigation} />
     )
   }
 }

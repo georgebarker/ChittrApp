@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
 import { Text, View, Button, StyleSheet } from 'react-native'
 export default class LandingScreen extends Component {
+  static navigationOptions () {
+    return {
+      headerShown: false
+    }
+  }
+
   render () {
     return (
       <View style={{

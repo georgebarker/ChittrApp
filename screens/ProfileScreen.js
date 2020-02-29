@@ -43,11 +43,11 @@ export default class ProfileScreen extends Component {
   }
 
   navigateToFollowing () {
-    this.props.navigation.navigate('Following', { followUsers: this.state.following })
+    this.props.navigation.navigate('Following', { users: this.state.following })
   }
 
   navigateToFollowers () {
-    this.props.navigation.navigate('Followers', { followUsers: this.state.followers })
+    this.props.navigation.navigate('Followers', { users: this.state.followers })
   }
 
   isViewLoading () {
