@@ -5,6 +5,8 @@ import LoadingView from '../components/LoadingView'
 import NoChitsFound from '../components/NoChitsFound'
 import ChitList from '../components/ChitList'
 import FloatingActionButton from '../components/FloatingActionButton'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 export default class ChitsScreen extends Component {
   constructor (props) {
@@ -13,6 +15,16 @@ export default class ChitsScreen extends Component {
       token: null,
       chits: [],
       isLoading: true
+    }
+  }
+
+  static navigationOptions ({ navigation }) {
+    return {
+      headerLeft: () => null,
+      headerRight: () =>
+        <TouchableOpacity style={{ marginRight: 12 }} onPress={() => navigation.navigate('UserSearch')}>
+          <Icon name='search' size={24} />
+        </TouchableOpacity>
     }
   }
 
@@ -55,7 +67,7 @@ export default class ChitsScreen extends Component {
     }
 
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <FloatingActionButton onPress={() => this.onNewChitButtonClicked()} />
         <ChitList chits={this.state.chits} navigation={this.props.navigation} />
       </View>
