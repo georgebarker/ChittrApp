@@ -1,12 +1,16 @@
 /* global fetch */
 import React, { Component } from 'react'
-import { View, TextInput, Button, Alert, Text } from 'react-native'
+import { View, TextInput, Button, Alert, Text, PermissionsAndroid } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
+import Geolocation from 'react-native-geolocation-service'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 export default class NewChitScreen extends Component {
   constructor (props) {
     super(props)
     this.state = {
       chitContent: '',
+      location: null,
       token: null
     }
   }
@@ -22,6 +26,39 @@ export default class NewChitScreen extends Component {
     }
   }
 
+  handleMissingLocationPermissions () {
+    Alert.alert('Oops!', 'Sorry, Chittr cannot add your location without permission.')
+  }
+
+  async requestLocationPermission () {
+    const granted = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
+      title: 'Chittr',
+      message: 'Chittr needs to know your location in order to add it to a Chit.',
+      buttonPositive: 'Okay'
+    })
+    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+      this.handleMissingLocationPermissions()
+    }
+  }
+
+  getCurrentLocation () {
+    this.requestLocationPermission()
+    Geolocation.getCurrentPosition(
+      (position) => {
+        this.setState({
+          location: position
+        })
+      },
+      (error) => {
+        console.log(error)
+        this.handleMissingLocationPermissions()
+      }, {
+        enableHighAccuracy: true,
+        timeout: 5 * 1000, // (ms) 5 seconds
+        maximumAge: 5 * 60 * 1000 // (ms) 5 minutes
+      })
+  }
+
   componentDidMount () {
     this.getToken()
   }
@@ -35,19 +72,28 @@ export default class NewChitScreen extends Component {
       Alert.alert('Oops!', 'Your chit doesn\'t say anything!')
       return
     }
+    const chitBody = {
+      timestamp: Date.now(),
+      chit_content: this.state.chitContent,
+      user: {
+        user_id: this.state.token.id
+      }
+    }
+    if (this.state.location) {
+      chitBody.location = {
+        latitude: this.state.location.coords.latitude,
+        longitude: this.state.location.coords.longitude
+      }
+    }
+    console.log(chitBody)
+
     fetch('http://10.0.2.2:3333/api/v0.0.5/chits', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Authorization': this.state.token.token
       },
-      body: JSON.stringify({
-        timestamp: Date.now(),
-        chit_content: this.state.chitContent,
-        user: {
-          user_id: this.state.token.id
-        }
-      })
+      body: JSON.stringify(chitBody)
     })
       .then((response) => {
         if (!response.ok) {
@@ -94,18 +140,27 @@ export default class NewChitScreen extends Component {
           style={{
             flex: 0,
             flexDirection: 'row',
-            justifyContent: 'flex-end'
-
+            justifyContent: 'flex-end',
+            alignItems: 'center'
           }}
         >
-          <Text style={{
-            fontSize: 16,
-            flex: 1,
-            textAlignVertical: 'center',
-            color: this.state.chitContent.length <= 141 ? 'black' : 'red'
-          }}
-          >{141 - this.state.chitContent.length + ' characters remaining'}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{
+              fontSize: 16,
+              textAlignVertical: 'center',
+              color: this.state.chitContent.length <= 141 ? 'black' : 'red'
+            }}
+            >{141 - this.state.chitContent.length + ' characters remaining'}
+            </Text>
+            <Text style={{ display: this.state.location ? 'flex' : 'none' }}>Location added!</Text>
+          </View>
+
+          <TouchableOpacity
+            style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
+            onPress={() => this.getCurrentLocation()}
+          >
+            <Icon name='map-marker' size={32} />
+          </TouchableOpacity>
           <Button style={{ flex: 1 }} title='Send' onPress={() => this.handleOnSendChitPress()} />
         </View>
 
