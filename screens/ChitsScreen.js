@@ -1,12 +1,13 @@
 /* global fetch */
 import React, { Component } from 'react'
-import { View } from 'react-native'
+import { View, Alert } from 'react-native'
 import LoadingView from '../components/LoadingView'
 import NoChitsFound from '../components/NoChitsFound'
 import ChitList from '../components/ChitList'
 import FloatingActionButton from '../components/FloatingActionButton'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import AsyncStorage from '@react-native-community/async-storage'
 
 export default class ChitsScreen extends Component {
   constructor (props) {
@@ -18,18 +19,35 @@ export default class ChitsScreen extends Component {
     }
   }
 
+  componentDidMount () {
+    this.getChits()
+    this.props.navigation.setParams({ handleSignOut: this.handleSignOut })
+  }
+
+  async handleSignOut (navigation) {
+    console.log('check no random calls!')
+    try {
+      await AsyncStorage.removeItem('TOKEN_KEY')
+      navigation.navigate('Landing')
+      Alert.alert('Success!', 'You have been signed out successfully.')
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   static navigationOptions ({ navigation }) {
     return {
       headerLeft: () => null,
       headerRight: () =>
-        <TouchableOpacity style={{ marginRight: 12 }} onPress={() => navigation.navigate('UserSearch')}>
-          <Icon name='search' size={24} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row' }}>
+          <TouchableOpacity style={{ margin: 8 }} onPress={() => navigation.navigate('UserSearch')}>
+            <Icon name='search' size={24} />
+          </TouchableOpacity>
+          <TouchableOpacity style={{ margin: 8 }} onPress={() => navigation.state.params.handleSignOut(navigation)}>
+            <Icon name='sign-out' size={24} />
+          </TouchableOpacity>
+        </View>
     }
-  }
-
-  componentDidMount () {
-    this.getChits()
   }
 
   getChits () {

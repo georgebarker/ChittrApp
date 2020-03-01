@@ -1,13 +1,48 @@
 import React, { Component } from 'react'
 import { Text, View, Button, StyleSheet } from 'react-native'
+import { ActivityIndicator } from 'react-native-paper'
+import AsyncStorage from '@react-native-community/async-storage'
 export default class LandingScreen extends Component {
+  constructor () {
+    super()
+    this.state = {
+      isTokenLoading: true
+    }
+  }
+
   static navigationOptions () {
     return {
       headerShown: false
     }
   }
 
+  async getToken () {
+    try {
+      const token = await AsyncStorage.getItem('TOKEN_KEY')
+      this.setState({
+        isTokenLoading: false
+      })
+      if (token !== null) {
+        this.props.navigation.navigate('Chits')
+      }
+    } catch (error) {
+      console.log('Couldn\'t get token')
+    }
+  }
+
+  componentDidMount () {
+    this.getToken()
+  }
+
   render () {
+    if (this.state.isTokenLoading) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center' }}>
+          <ActivityIndicator />
+        </View>
+      )
+    }
+
     return (
       <View style={{
         flex: 1,
