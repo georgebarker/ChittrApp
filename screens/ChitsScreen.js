@@ -25,7 +25,6 @@ export default class ChitsScreen extends Component {
   }
 
   async handleSignOut (navigation) {
-    console.log('check no random calls!')
     try {
       await AsyncStorage.removeItem('TOKEN_KEY')
       navigation.navigate('Landing')

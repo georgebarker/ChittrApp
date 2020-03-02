@@ -152,8 +152,10 @@ android {
         }
     }
     buildTypes {
+        def chittrGoogleMapsApiKey = findProperty('Chittr_GoogleMaps_APIKey') ? Chittr_GoogleMaps_APIKey : "\"NoKeyFound\""
         debug {
             signingConfig signingConfigs.debug
+            resValue 'string', "chittrGoogleMapsApiKey", chittrGoogleMapsApiKey
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -161,6 +163,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            resValue 'string', "chittrGoogleMapsApiKey", chittrGoogleMapsApiKey
         }
     }
     // applicationVariants are e.g. debug, release
