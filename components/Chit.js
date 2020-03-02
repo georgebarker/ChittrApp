@@ -3,6 +3,7 @@ import { Text, View, Image, TouchableOpacity } from 'react-native'
 import TimeAgo from 'react-native-timeago'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import ChitMapView from './ChitMapView'
+import UserPhoto from './UserPhoto'
 
 export default class Chit extends Component {
   constructor () {
@@ -35,10 +36,7 @@ export default class Chit extends Component {
             }}
             onPress={() => this.navigateToProfile(this.props.chit.user.user_id)}
           >
-            <Image
-              style={{ width: 50, height: 50 }}
-              source={{ uri: 'https://facebook.github.io/react-native/img/tiny_logo.png' }}
-            />
+            <UserPhoto width={50} height={50} userId={this.props.chit.user.user_id} />
           </TouchableOpacity>
           <View
             style={{ flex: 5, padding: 5 }}
