@@ -11,6 +11,7 @@ export default class NewChitScreen extends Component {
     this.state = {
       chitContent: '',
       location: null,
+      photo: null,
       token: null
     }
   }
@@ -26,6 +27,35 @@ export default class NewChitScreen extends Component {
     }
   }
 
+  handleTakePhotoPressed () {
+    this.props.navigation.navigate('ChitCamera', { onPhotoTaken: this.onPhotoTaken.bind(this) })
+  }
+
+  onPhotoTaken (photo) {
+    this.setState({ photo: photo })
+  }
+
+  postPhotoAttachment (chitId) {
+    fetch('http://10.0.2.2:3333/api/v0.0.5/chits/' + chitId + '/photo', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'image/jpeg',
+        'X-Authorization': this.state.token.token
+      },
+      body: this.state.photo
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error()
+        }
+        this.handleSuccess()
+      })
+      .catch((error) => {
+        console.log(error)
+        this.handleFailure()
+      })
+  }
+
   handleMissingLocationPermissions () {
     Alert.alert('Oops!', 'Sorry, Chittr cannot add your location without permission.')
   }
@@ -36,6 +66,7 @@ export default class NewChitScreen extends Component {
       message: 'Chittr needs to know your location in order to add it to a Chit.',
       buttonPositive: 'Okay'
     })
+    // TODO if granted then getCurrentLocation
     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
       this.handleMissingLocationPermissions()
     }
@@ -85,7 +116,6 @@ export default class NewChitScreen extends Component {
         longitude: this.state.location.coords.longitude
       }
     }
-    console.log(chitBody)
 
     fetch('http://10.0.2.2:3333/api/v0.0.5/chits', {
       method: 'POST',
@@ -99,7 +129,14 @@ export default class NewChitScreen extends Component {
         if (!response.ok) {
           throw Error()
         }
-        this.handleSuccess()
+        return response.json()
+      })
+      .then((responseJson) => {
+        if (this.state.photo) {
+          this.postPhotoAttachment(responseJson.chit_id)
+        } else {
+          this.handleSuccess()
+        }
       })
       .catch((error) => {
         console.log(error)
@@ -152,9 +189,15 @@ export default class NewChitScreen extends Component {
             }}
             >{141 - this.state.chitContent.length + ' characters remaining'}
             </Text>
-            <Text style={{ display: this.state.location ? 'flex' : 'none' }}>Location added!</Text>
+            <Text style={{ display: this.state.location ? 'flex' : 'none' }}>Location added</Text>
+            <Text style={{ display: this.state.photo ? 'flex' : 'none' }}>Photo attached</Text>
           </View>
-
+          <TouchableOpacity
+            style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
+            onPress={() => this.handleTakePhotoPressed()}
+          >
+            <Icon name='camera' size={28} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
             onPress={() => this.getCurrentLocation()}
