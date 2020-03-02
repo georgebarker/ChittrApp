@@ -1,11 +1,12 @@
 /* global fetch */
 import React, { Component } from 'react'
-import { View, Text, Image, Button, Alert } from 'react-native'
+import { View, Text, Button, Alert } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 import LoadingView from '../components/LoadingView'
 import GlobalStyles from '../GlobalStyles'
 import ChitList from '../components/ChitList'
 import VerticalDivider from '../components/VerticalDivider'
+import UserPhoto from '../components/UserPhoto'
 export default class ProfileScreen extends Component {
   constructor (props) {
     super(props)
@@ -187,10 +188,7 @@ export default class ProfileScreen extends Component {
               alignItems: 'center'
             }}
           >
-            <Image
-              style={{ width: 100, height: 100 }}
-              source={{ uri: 'https://facebook.github.io/react-native/img/tiny_logo.png' }}
-            />
+            <UserPhoto width={100} height={100} userId={this.state.userId} />
           </View>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-evenly' }}>
             <Text>{this.state.givenName + ' ' + this.state.familyName}</Text>

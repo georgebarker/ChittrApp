@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import { Text, View, Image, TouchableOpacity } from 'react-native'
+import { Text, View, TouchableOpacity } from 'react-native'
+import UserPhoto from './UserPhoto'
 export default class User extends Component {
   navigateToProfile (userId) {
     this.props.navigation.navigate('Profile', { userId: userId })
@@ -23,10 +24,7 @@ export default class User extends Component {
           }}
           onPress={() => this.navigateToProfile(this.props.user.user_id)}
         >
-          <Image
-            style={{ width: 50, height: 50 }}
-            source={{ uri: 'https://facebook.github.io/react-native/img/tiny_logo.png' }}
-          />
+          <UserPhoto width={50} height={50} userId={this.props.user.user_id} />
         </TouchableOpacity>
 
         <Text
