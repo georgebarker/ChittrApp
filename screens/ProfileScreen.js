@@ -210,7 +210,14 @@ export default class ProfileScreen extends Component {
               alignItems: 'center'
             }}
           >
-            <UserPhoto width={100} height={100} userId={this.state.userId} />
+            <UserPhoto
+              width={100}
+              height={100}
+              userId={this.state.userId}
+              editable={this.isViewingOwnProfile()}
+              token={this.state.token}
+              navigation={this.props.navigation}
+            />
           </View>
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'space-evenly' }}>
             <Text>{this.state.givenName + ' ' + this.state.familyName}</Text>
@@ -242,7 +249,10 @@ export default class ProfileScreen extends Component {
         <View style={{ flex: 1 }}>
           <Text style={{ textAlign: 'center', fontSize: 20 }}>{this.state.givenName + ' ' + this.state.familyName + '\'s recent chits'}</Text>
           <View>
-            <ChitList chits={this.state.chits} navigation={this.props.navigation} />
+            <ChitList
+              chits={this.state.chits}
+              navigation={this.props.navigation}
+            />
           </View>
         </View>
       </View>
