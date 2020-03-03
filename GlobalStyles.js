@@ -13,6 +13,7 @@ export default StyleSheet.create({
     alignSelf: 'stretch'
   },
   buttonContainer: {
-    width: 100
+    width: 100,
+    backgroundColor: 'green'
   }
 })

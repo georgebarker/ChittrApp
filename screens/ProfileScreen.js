@@ -38,6 +38,10 @@ export default class ProfileScreen extends Component {
     }
   }
 
+  isViewingOwnProfile () {
+    return this.state.token.id === this.state.userId
+  }
+
   doesCurrentUserFollowThem () {
     var doesUserFollow = this.state.followers.filter(user => user.user_id === this.state.token.id).length > 0
     this.setState({ doesCurrentUserFollowThem: doesUserFollow })
@@ -49,6 +53,20 @@ export default class ProfileScreen extends Component {
 
   navigateToFollowers () {
     this.props.navigation.navigate('Followers', { users: this.state.followers })
+  }
+
+  navigateToEditProfile () {
+    this.props.navigation.navigate('EditProfile',
+      {
+        user: {
+          id: this.state.userId,
+          givenName: this.state.givenName,
+          familyName: this.state.familyName,
+          email: this.state.email,
+          token: this.state.token
+        },
+        onProfileUpdated: this.updateProfile.bind(this)
+      })
   }
 
   isViewLoading () {
@@ -65,22 +83,26 @@ export default class ProfileScreen extends Component {
   // This method is used to update the component when a different user's profile has been clicked on
   componentDidUpdate (prevProps) {
     if (prevProps.navigation.state.params.userId !== this.props.navigation.state.params.userId && !this.state.profileUpdateTriggered) {
+      this.updateProfile()
+    }
+  }
+
+  updateProfile () {
+    this.setState({
+      profileUpdateTriggered: true
+    })
+    this.getProfile()
+    this.getFollowers()
+    this.getFollowing()
+    if (!this.isViewLoading()) {
       this.setState({
-        profileUpdateTriggered: true
+        profileUpdateTriggered: false
       })
-      this.getProfile()
-      this.getFollowers()
-      this.getFollowing()
-      if (!this.isViewLoading()) {
-        this.setState({
-          profileUpdateTriggered: false
-        })
-      }
     }
   }
 
   onFollowButtonPressed () {
-    if (this.state.token.id === this.state.userId) {
+    if (this.isViewingOwnProfile()) {
       Alert.alert('Oops!', 'You can\'t follow yourself!')
       return
     }
@@ -199,11 +221,19 @@ export default class ProfileScreen extends Component {
               <Text onPress={() => this.navigateToFollowers()}>{this.state.followers.length + ' Followers'}</Text>
             </View>
             <View
-              style={[GlobalStyles.buttonContainer, { margin: 10 }]}
+              style={[GlobalStyles.buttonContainer, { margin: 10, display: this.isViewingOwnProfile() ? 'none' : 'flex' }]}
             >
               <Button
                 title={this.state.doesCurrentUserFollowThem ? 'Unfollow' : 'Follow'}
                 onPress={() => this.onFollowButtonPressed()}
+              />
+            </View>
+            <View
+              style={[GlobalStyles.buttonContainer, { margin: 10, display: this.isViewingOwnProfile() ? 'flex' : 'none' }]}
+            >
+              <Button
+                title='Edit profile'
+                onPress={() => this.navigateToEditProfile()}
               />
             </View>
           </View>
