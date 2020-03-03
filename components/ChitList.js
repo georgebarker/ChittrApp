@@ -11,6 +11,8 @@ export default class ChitList extends Component {
           renderItem={({ item }) => <Chit chit={item} navigation={this.props.navigation} />}
           keyExtractor={item => item.chit_id.toString()}
           ItemSeparatorComponent={HorizontalDivider}
+          onRefresh={this.props.onRefresh}
+          refreshing={this.props.isLoading}
         />
       </View>
     )
