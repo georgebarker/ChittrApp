@@ -8,13 +8,15 @@ import FloatingActionButton from '../components/FloatingActionButton'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-community/async-storage'
-var count = 0
+import { ActivityIndicator } from 'react-native-paper'
 export default class ChitsScreen extends Component {
   constructor (props) {
     super(props)
     this.state = {
       chits: [],
-      isLoading: true
+      start: 0,
+      isLoading: true,
+      isLoadingMore: false
     }
   }
 
@@ -65,18 +67,32 @@ export default class ChitsScreen extends Component {
   }
 
   getChits () {
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=0&count=10').then((response) => response.json()).then((responseJson) => {
+    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=' + this.state.start + '&count=10').then((response) => response.json()).then((responseJson) => {
+      Array.prototype.push.apply(this.state.chits, responseJson)
       this.setState({
-        chits: responseJson,
-        isLoading: false
+        start: this.state.start + 10,
+        isLoading: false,
+        isLoadingMore: false
       })
     }).catch((error) => {
       console.log(error)
     })
   }
 
-  refreshChits () {
-    this.setState({ isLoading: true })
+  async refreshChits () {
+    // await to ensure the start index is reset back to 0 before requesting the Chits
+    await this.setState({
+      chits: [],
+      isLoading: true,
+      start: 0
+    })
+    this.getChits()
+  }
+
+  loadMoreChits () {
+    this.setState({
+      isLoadingMore: true
+    })
     this.getChits()
   }
 
@@ -101,7 +117,8 @@ export default class ChitsScreen extends Component {
     return (
       <View style={{ flex: 1 }}>
         <FloatingActionButton onPress={() => this.onNewChitButtonClicked()} />
-        <ChitList chits={this.state.chits} navigation={this.props.navigation} onRefresh={this.refreshChits.bind(this)} isLoading={this.state.isLoading} />
+        <ChitList chits={this.state.chits} navigation={this.props.navigation} onRefresh={this.refreshChits.bind(this)} isLoading={this.state.isLoading} onEndReached={this.loadMoreChits.bind(this)} />
+        <ActivityIndicator style={{ display: this.state.isLoadingMore ? 'flex' : 'none' }} />
       </View>
     )
   }
