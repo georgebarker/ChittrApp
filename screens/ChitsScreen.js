@@ -73,7 +73,7 @@ export default class ChitsScreen extends Component {
         console.log(error)
       })
     try {
-      await AsyncStorage.removeItem('TOKEN_KEY')
+      await AsyncStorage.clear()
       navigation.navigate('Landing')
       Alert.alert('Success!', 'You have been signed out successfully.')
     } catch (e) {

@@ -12,7 +12,8 @@ export default class NewChitScreen extends Component {
       chitContent: '',
       location: null,
       photo: null,
-      token: null
+      token: null,
+      draftTimestamp: null
     }
   }
 
@@ -31,6 +32,22 @@ export default class NewChitScreen extends Component {
     this.props.navigation.navigate('ChitCamera', { onPhotoTaken: this.onPhotoTaken.bind(this) })
   }
 
+  navigateToDrafts () {
+    this.props.navigation.navigate('Drafts', {
+      onDraftSelected: this.onDraftSelected.bind(this),
+      onDraftDeletePressed: this.removeFromDrafts.bind(this)
+    })
+  }
+
+  onDraftSelected (draft) {
+    this.setState({
+      chitContent: draft.chit_content,
+      location: draft.location,
+      photo: draft.photo,
+      draftTimestamp: draft.timestamp
+    })
+  }
+
   onPhotoTaken (photo) {
     this.setState({ photo: photo })
   }
@@ -47,12 +64,19 @@ export default class NewChitScreen extends Component {
       draftsToSave.push(chit)
       await AsyncStorage.setItem('DRAFTS_KEY', JSON.stringify(draftsToSave))
       Alert.alert('Success!', 'Chit saved to drafts successfully.')
+      this.props.navigation.goBack()
     } catch (error) {
       console.log(error)
       Alert.alert('Oops!', 'Couldn\'t save Chit to drafts. Please try again.')
     }
-    const drafts = await AsyncStorage.getItem('DRAFTS_KEY')
-    console.log(drafts)
+  }
+
+  async removeFromDrafts (draftTimestamp) {
+    if (draftTimestamp) {
+      const drafts = await AsyncStorage.getItem('DRAFTS_KEY')
+      const draftsWithItemRemoved = JSON.parse(drafts).filter(_draft => _draft.timestamp !== draftTimestamp)
+      await AsyncStorage.setItem('DRAFTS_KEY', JSON.stringify(draftsWithItemRemoved))
+    }
   }
 
   constructChitBody () {
@@ -63,12 +87,11 @@ export default class NewChitScreen extends Component {
         user_id: this.state.token.id
       }
     }
+
     if (this.state.location) {
-      chitBody.location = {
-        latitude: this.state.location.coords.latitude,
-        longitude: this.state.location.coords.longitude
-      }
+      chitBody.location = this.state.location
     }
+
     return chitBody
   }
 
@@ -103,8 +126,10 @@ export default class NewChitScreen extends Component {
       message: 'Chittr needs to know your location in order to add it to a Chit.',
       buttonPositive: 'Okay'
     })
-    // TODO if granted then getCurrentLocation
-    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      this.getCurrentLocation()
+    } else {
       this.handleMissingLocationPermissions()
     }
   }
@@ -114,7 +139,10 @@ export default class NewChitScreen extends Component {
     Geolocation.getCurrentPosition(
       (position) => {
         this.setState({
-          location: position
+          location: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          }
         })
       },
       (error) => {
@@ -141,13 +169,14 @@ export default class NewChitScreen extends Component {
       return
     }
 
+    const chitBody = this.constructChitBody()
     fetch('http://10.0.2.2:3333/api/v0.0.5/chits', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Authorization': this.state.token.token
       },
-      body: JSON.stringify(this.constructChitBody())
+      body: JSON.stringify(chitBody)
     })
       .then((response) => {
         if (!response.ok) {
@@ -170,6 +199,7 @@ export default class NewChitScreen extends Component {
 
   handleSuccess () {
     Alert.alert('Success!', 'Chit posted.')
+    this.removeFromDrafts(this.state.draftTimestamp)
     this.props.navigation.state.params.refreshChits()
     this.props.navigation.goBack()
   }
@@ -196,6 +226,7 @@ export default class NewChitScreen extends Component {
             flex: 1,
             fontSize: 20
           }}
+          value={this.state.chitContent}
         />
         <View
           style={{
@@ -217,22 +248,28 @@ export default class NewChitScreen extends Component {
             <Text style={{ display: this.state.photo ? 'flex' : 'none' }}>Photo attached</Text>
           </View>
           <TouchableOpacity
-            style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
+            style={{ flex: 1, marginRight: 16, justifyContent: 'center' }}
+            onPress={() => this.navigateToDrafts()}
+          >
+            <Icon name='archive' size={20} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{ flex: 1, marginRight: 16, justifyContent: 'center' }}
             onPress={() => this.saveToDrafts()}
           >
-            <Icon name='save' size={28} />
+            <Icon name='save' size={20} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
+            style={{ flex: 1, marginRight: 16, justifyContent: 'center' }}
             onPress={() => this.handleTakePhotoPressed()}
           >
-            <Icon name='camera' size={28} />
+            <Icon name='camera' size={20} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
+            style={{ flex: 1, marginRight: 16, justifyContent: 'center' }}
             onPress={() => this.getCurrentLocation()}
           >
-            <Icon name='map-marker' size={32} />
+            <Icon name='map-marker' size={20} />
           </TouchableOpacity>
           <Button style={{ flex: 1 }} title='Send' onPress={() => this.handleOnSendChitPress()} />
         </View>

@@ -10,6 +10,7 @@ import NewChitScreen from './screens/NewChitScreen'
 import UserSearchScreen from './screens/UserSearchScreen'
 import ChitCamera from './components/ChitCamera'
 import EditProfileScreen from './screens/EditProfileScreen'
+import DraftsScreen from './screens/DraftsScreen'
 const AppStackNav = createStackNavigator({
 
   Landing: {
@@ -47,6 +48,9 @@ const AppStackNav = createStackNavigator({
   },
   EditProfile: {
     screen: EditProfileScreen
+  },
+  Drafts: {
+    screen: DraftsScreen
   }
 })
 
