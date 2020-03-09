@@ -35,6 +35,43 @@ export default class NewChitScreen extends Component {
     this.setState({ photo: photo })
   }
 
+  async saveToDrafts () {
+    try {
+      const drafts = await AsyncStorage.getItem('DRAFTS_KEY')
+      const draftsToSave = drafts ? JSON.parse(drafts) : []
+      const chit = this.constructChitBody()
+      if (this.state.photo) {
+        chit.photo = this.state.photo
+      }
+
+      draftsToSave.push(chit)
+      await AsyncStorage.setItem('DRAFTS_KEY', JSON.stringify(draftsToSave))
+      Alert.alert('Success!', 'Chit saved to drafts successfully.')
+    } catch (error) {
+      console.log(error)
+      Alert.alert('Oops!', 'Couldn\'t save Chit to drafts. Please try again.')
+    }
+    const drafts = await AsyncStorage.getItem('DRAFTS_KEY')
+    console.log(drafts)
+  }
+
+  constructChitBody () {
+    const chitBody = {
+      timestamp: Date.now(),
+      chit_content: this.state.chitContent,
+      user: {
+        user_id: this.state.token.id
+      }
+    }
+    if (this.state.location) {
+      chitBody.location = {
+        latitude: this.state.location.coords.latitude,
+        longitude: this.state.location.coords.longitude
+      }
+    }
+    return chitBody
+  }
+
   postPhotoAttachment (chitId) {
     fetch('http://10.0.2.2:3333/api/v0.0.5/chits/' + chitId + '/photo', {
       method: 'POST',
@@ -103,19 +140,6 @@ export default class NewChitScreen extends Component {
       Alert.alert('Oops!', 'Your chit doesn\'t say anything!')
       return
     }
-    const chitBody = {
-      timestamp: Date.now(),
-      chit_content: this.state.chitContent,
-      user: {
-        user_id: this.state.token.id
-      }
-    }
-    if (this.state.location) {
-      chitBody.location = {
-        latitude: this.state.location.coords.latitude,
-        longitude: this.state.location.coords.longitude
-      }
-    }
 
     fetch('http://10.0.2.2:3333/api/v0.0.5/chits', {
       method: 'POST',
@@ -123,7 +147,7 @@ export default class NewChitScreen extends Component {
         'Content-Type': 'application/json',
         'X-Authorization': this.state.token.token
       },
-      body: JSON.stringify(chitBody)
+      body: JSON.stringify(this.constructChitBody())
     })
       .then((response) => {
         if (!response.ok) {
@@ -192,6 +216,12 @@ export default class NewChitScreen extends Component {
             <Text style={{ display: this.state.location ? 'flex' : 'none' }}>Location added</Text>
             <Text style={{ display: this.state.photo ? 'flex' : 'none' }}>Photo attached</Text>
           </View>
+          <TouchableOpacity
+            style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
+            onPress={() => this.saveToDrafts()}
+          >
+            <Icon name='save' size={28} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={{ flex: 1, marginRight: 20, justifyContent: 'center' }}
             onPress={() => this.handleTakePhotoPressed()}
