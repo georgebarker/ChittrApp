@@ -13,6 +13,7 @@ export default class ChitsScreen extends Component {
   constructor (props) {
     super(props)
     this.state = {
+      token: null,
       chits: [],
       start: 0,
       isLoading: true,
@@ -57,6 +58,20 @@ export default class ChitsScreen extends Component {
   }
 
   async handleSignOut (navigation) {
+    fetch('http://10.0.2.2:3333/api/v0.0.5/logout', {
+      method: 'POST',
+      headers: {
+        'X-Authorization': navigation.state.params.token.token
+      }
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw Error()
+        }
+      })
+      .catch((error) => {
+        console.log(error)
+      })
     try {
       await AsyncStorage.removeItem('TOKEN_KEY')
       navigation.navigate('Landing')
