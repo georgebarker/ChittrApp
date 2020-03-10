@@ -3,10 +3,10 @@ import React, { Component } from 'react'
 import { View, Text, Button, Alert } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 import LoadingView from '../components/LoadingView'
-import GlobalStyles from '../GlobalStyles'
 import ChitList from '../components/ChitList'
 import VerticalDivider from '../components/VerticalDivider'
 import UserPhoto from '../components/UserPhoto'
+import { followUserUrl, getFollowingUrl, getFollowersUrl, getUserProfileUrl } from '../UrlHelper'
 export default class ProfileScreen extends Component {
   constructor (props) {
     super(props)
@@ -116,7 +116,7 @@ export default class ProfileScreen extends Component {
       method = 'POST'
       message = 'You are now following ' + this.state.givenName + ' ' + this.state.familyName
     }
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.state.userId + '/follow', {
+    fetch(followUserUrl(this.state.userId), {
       method: method,
       headers: {
         'Content-Type': 'application/json',
@@ -138,52 +138,58 @@ export default class ProfileScreen extends Component {
 
   getFollowing () {
     this.setState({ isFollowingLoading: true })
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.navigation.state.params.userId + '/following').then((response) => response.json()).then((responseJson) => {
-      this.setState({
-        following: responseJson,
-        isFollowingLoading: false
+    fetch(getFollowingUrl(this.props.navigation.state.params.userId))
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          following: responseJson,
+          isFollowingLoading: false
+        })
+      }).catch((error) => {
+        console.log(error)
       })
-    }).catch((error) => {
-      console.log(error)
-    })
   }
 
   getFollowers () {
     this.setState({ isFollowersLoading: true })
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.navigation.state.params.userId + '/followers').then((response) => response.json()).then((responseJson) => {
-      this.setState({
-        followers: responseJson,
-        isFollowersLoading: false
+    fetch(getFollowersUrl(this.props.navigation.state.params.userId))
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          followers: responseJson,
+          isFollowersLoading: false
+        })
+        this.doesCurrentUserFollowThem()
+      }).catch((error) => {
+        console.log(error)
       })
-      this.doesCurrentUserFollowThem()
-    }).catch((error) => {
-      console.log(error)
-    })
   }
 
   getProfile () {
     this.setState({ isProfileLoading: true })
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.navigation.state.params.userId).then((response) => response.json()).then((responseJson) => {
+    fetch(getUserProfileUrl(this.props.navigation.state.params.userId))
+      .then((response) => response.json())
+      .then((responseJson) => {
       // populates Chits with user metadata
-      responseJson.recent_chits.map((chit) => {
-        chit.user = {
-          user_id: this.props.navigation.state.params.userId,
-          given_name: responseJson.given_name,
-          family_name: responseJson.family_name
-        }
-      })
+        responseJson.recent_chits.map((chit) => {
+          chit.user = {
+            user_id: this.props.navigation.state.params.userId,
+            given_name: responseJson.given_name,
+            family_name: responseJson.family_name
+          }
+        })
 
-      this.setState({
-        userId: responseJson.user_id,
-        givenName: responseJson.given_name,
-        familyName: responseJson.family_name,
-        email: responseJson.email,
-        chits: responseJson.recent_chits,
-        isProfileLoading: false
+        this.setState({
+          userId: responseJson.user_id,
+          givenName: responseJson.given_name,
+          familyName: responseJson.family_name,
+          email: responseJson.email,
+          chits: responseJson.recent_chits,
+          isProfileLoading: false
+        })
+      }).catch((error) => {
+        console.log(error)
       })
-    }).catch((error) => {
-      console.log(error)
-    })
   }
 
   render () {
@@ -228,7 +234,7 @@ export default class ProfileScreen extends Component {
               <Text onPress={() => this.navigateToFollowers()}>{this.state.followers.length + ' Followers'}</Text>
             </View>
             <View
-              style={[GlobalStyles.buttonContainer, { margin: 10, display: this.isViewingOwnProfile() ? 'none' : 'flex' }]}
+              style={{ margin: 10, display: this.isViewingOwnProfile() ? 'none' : 'flex' }}
             >
               <Button
                 title={this.state.doesCurrentUserFollowThem ? 'Unfollow' : 'Follow'}
@@ -236,7 +242,7 @@ export default class ProfileScreen extends Component {
               />
             </View>
             <View
-              style={[GlobalStyles.buttonContainer, { margin: 10, display: this.isViewingOwnProfile() ? 'flex' : 'none' }]}
+              style={{ margin: 10, display: this.isViewingOwnProfile() ? 'flex' : 'none' }}
             >
               <Button
                 title='Edit profile'

@@ -1,6 +1,7 @@
 /* global fetch, FileReader */
 import React, { Component } from 'react'
 import { View, Image } from 'react-native'
+import { getChitPhotoUrl } from '../UrlHelper'
 export default class ChitPhotoView extends Component {
   constructor () {
     super()
@@ -14,13 +15,14 @@ export default class ChitPhotoView extends Component {
   }
 
   fetchChitPhoto () {
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits/' + this.props.chit.chit_id + '/photo').then((response) => {
-      if (response.status !== 404) {
-        return response.blob()
-      } else {
-        throw Error('No image found for ChitID: ' + this.props.chit.chit_id)
-      }
-    })
+    return fetch(getChitPhotoUrl(this.props.chit.chit_id))
+      .then((response) => {
+        if (response.status !== 404) {
+          return response.blob()
+        } else {
+          throw Error('No image found for ChitID: ' + this.props.chit.chit_id)
+        }
+      })
       .then((responseBlob) => {
         var reader = new FileReader()
         reader.readAsDataURL(responseBlob)

@@ -1,8 +1,8 @@
 /* global fetch */
 import React, { Component } from 'react'
-import { Text, View, TextInput, Button, Alert } from 'react-native'
-import GlobalStyles from '../GlobalStyles'
+import { Text, View, TextInput, Button, Alert, StyleSheet } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
+import { loginUrl } from '../UrlHelper'
 export default class LoginScreen extends Component {
   constructor (props) {
     super(props)
@@ -24,7 +24,7 @@ export default class LoginScreen extends Component {
 
   onLoginPressed () {
     if (this.isRequestValid()) {
-      fetch('http://10.0.2.2:3333/api/v0.0.5/login', {
+      fetch(loginUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -84,20 +84,20 @@ export default class LoginScreen extends Component {
           }}
         >Chittr
         </Text>
-        <View style={GlobalStyles.formContainer}>
+        <View style={styles.formContainer}>
           <Text>Email address</Text>
           <TextInput
-            textContentType='emailAddress' maxLength={320} style={GlobalStyles.textInput}
+            textContentType='emailAddress' maxLength={320} style={styles.textInput}
             onChangeText={(text) => this.setState({ email: text, isEmailValid: true })}
           />
           <Text>Password</Text>
           <TextInput
-            secureTextEntry textContentType='newPassword' maxLength={512} style={GlobalStyles.textInput}
+            secureTextEntry textContentType='newPassword' maxLength={512} style={styles.textInput}
             onChangeText={(text) => this.setState({ password: text })}
           />
         </View>
         <View
-          style={GlobalStyles.buttonContainer}
+          style={styles.buttonContainer}
         >
           <Button
             title='Login'
@@ -108,3 +108,21 @@ export default class LoginScreen extends Component {
     )
   }
 }
+
+const styles = StyleSheet.create({
+  textInput: {
+    borderColor: 'black',
+    backgroundColor: 'white',
+    borderWidth: 1,
+    marginBottom: 20
+  },
+  formContainer: {
+    padding: 10,
+    margin: 20,
+    alignSelf: 'stretch'
+  },
+  buttonContainer: {
+    width: 100,
+    backgroundColor: 'green'
+  }
+})

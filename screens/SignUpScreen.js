@@ -2,10 +2,11 @@
 import React, { Component } from 'react'
 import { Alert } from 'react-native'
 import UserDetailsForm from '../components/UserDetailsForm'
+import { postUserSignUpUrl } from '../UrlHelper'
 
 export default class SignUpScreen extends Component {
   onSignUpPressed (userDetailsForm) {
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user', {
+    fetch(postUserSignUpUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

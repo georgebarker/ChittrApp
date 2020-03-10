@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/FontAwesome'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-community/async-storage'
 import { ActivityIndicator } from 'react-native-paper'
+import { getChitsUrl, logoutUrl } from '../UrlHelper'
 export default class ChitsScreen extends Component {
   constructor (props) {
     super(props)
@@ -58,7 +59,7 @@ export default class ChitsScreen extends Component {
   }
 
   async handleSignOut (navigation) {
-    fetch('http://10.0.2.2:3333/api/v0.0.5/logout', {
+    fetch(logoutUrl(), {
       method: 'POST',
       headers: {
         'X-Authorization': navigation.state.params.token.token
@@ -82,16 +83,18 @@ export default class ChitsScreen extends Component {
   }
 
   getChits () {
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/chits?start=' + this.state.start + '&count=10').then((response) => response.json()).then((responseJson) => {
-      Array.prototype.push.apply(this.state.chits, responseJson)
-      this.setState({
-        start: this.state.start + 10,
-        isLoading: false,
-        isLoadingMore: false
+    return fetch(getChitsUrl(this.state.start))
+      .then((response) => response.json())
+      .then((responseJson) => {
+        Array.prototype.push.apply(this.state.chits, responseJson)
+        this.setState({
+          start: this.state.start + 10,
+          isLoading: false,
+          isLoadingMore: false
+        })
+      }).catch((error) => {
+        console.log(error)
       })
-    }).catch((error) => {
-      console.log(error)
-    })
   }
 
   async refreshChits () {

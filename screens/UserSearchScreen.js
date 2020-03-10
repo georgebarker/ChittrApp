@@ -4,6 +4,7 @@ import { View, Text } from 'react-native'
 import UserList from '../components/UserList'
 import { Searchbar } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/FontAwesome'
+import { getUsersUrl } from '../UrlHelper'
 
 export default class UserSearchScreen extends Component {
   constructor (props) {
@@ -24,7 +25,7 @@ export default class UserSearchScreen extends Component {
       this.setState({ searchUsers: null })
       return
     }
-    return fetch('http://10.0.2.2:3333/api/v0.0.5/search_user?q=' + query).then((response) => response.json()).then((responseJson) => {
+    return fetch(getUsersUrl(query)).then((response) => response.json()).then((responseJson) => {
       this.setState({
         searchUsers: responseJson
       })
