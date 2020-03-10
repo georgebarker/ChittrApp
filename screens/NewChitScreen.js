@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import Geolocation from 'react-native-geolocation-service'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { postPhotoAttachmentUrl, postChitsUrl } from '../UrlHelper'
 export default class NewChitScreen extends Component {
   constructor (props) {
     super(props)
@@ -96,7 +97,7 @@ export default class NewChitScreen extends Component {
   }
 
   postPhotoAttachment (chitId) {
-    fetch('http://10.0.2.2:3333/api/v0.0.5/chits/' + chitId + '/photo', {
+    fetch(postPhotoAttachmentUrl(chitId), {
       method: 'POST',
       headers: {
         'Content-Type': 'image/jpeg',
@@ -170,7 +171,7 @@ export default class NewChitScreen extends Component {
     }
 
     const chitBody = this.constructChitBody()
-    fetch('http://10.0.2.2:3333/api/v0.0.5/chits', {
+    fetch(postChitsUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -8,7 +8,7 @@ export default class User extends Component {
 
   render () {
     return (
-      <View
+      <TouchableOpacity
         style={{
           flex: 1,
           flexDirection: 'row',
@@ -17,22 +17,15 @@ export default class User extends Component {
           marginLeft: 20,
           marginRight: 20
         }}
+        onPress={() => this.navigateToProfile(this.props.user.user_id)}
       >
-        <TouchableOpacity
-          style={{
-            flex: 0
-          }}
-          onPress={() => this.navigateToProfile(this.props.user.user_id)}
-        >
+        <View style={{ flex: 0 }}>
           <UserPhoto width={50} height={50} userId={this.props.user.user_id} />
-        </TouchableOpacity>
-
-        <Text
-          onPress={() => this.navigateToProfile(this.props.user.user_id)}
-          style={{ flex: 1, fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}
-        >{this.props.user.given_name + ' ' + this.props.user.family_name}
+        </View>
+        <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>
+          {this.props.user.given_name + ' ' + this.props.user.family_name}
         </Text>
-      </View>
+      </TouchableOpacity>
     )
   }
 }

@@ -2,9 +2,10 @@
 import React, { Component } from 'react'
 import { Alert } from 'react-native'
 import UserDetailsForm from '../components/UserDetailsForm'
+import { patchUserDetailsUrl } from '../UrlHelper'
 export default class EditProfileScreen extends Component {
   onSaveProfilePressed (userDetailsForm) {
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.navigation.state.params.user.id, {
+    fetch(patchUserDetailsUrl(this.props.navigation.state.params.user.id), {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',

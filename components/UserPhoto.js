@@ -4,6 +4,7 @@ import { Image, Alert } from 'react-native'
 import { ActivityIndicator } from 'react-native-paper'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import { postUserPhotoUrl, getUserPhotoUrl } from '../UrlHelper'
 export default class UserPhoto extends Component {
   constructor () {
     super()
@@ -13,7 +14,7 @@ export default class UserPhoto extends Component {
   }
 
   onPhotoTaken (photo) {
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/photo', {
+    fetch(postUserPhotoUrl(), {
       method: 'POST',
       headers: {
         'Content-Type': 'image/jpeg',
@@ -47,7 +48,7 @@ export default class UserPhoto extends Component {
   }
 
   fetchUserPhoto () {
-    fetch('http://10.0.2.2:3333/api/v0.0.5/user/' + this.props.userId + '/photo', {
+    fetch(getUserPhotoUrl(this.props.userId), {
       headers: {
         'Content-Type': 'application/json'
       }
